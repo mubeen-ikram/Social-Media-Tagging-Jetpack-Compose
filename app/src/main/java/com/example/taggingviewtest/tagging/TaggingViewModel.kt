@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 
 
-class TaggingViewModel : ViewModel() {
+open class TaggingViewModel : ViewModel() {
     /**
      * for tag character and space at the end
      */
@@ -54,7 +54,7 @@ class TaggingViewModel : ViewModel() {
     private val tempTagEndIndex = MutableStateFlow(-1)
     private val tempTagStartIndex = MutableStateFlow(-1)
 
-    fun initViewModel(
+    fun initTaggingViews(
         taggingList: MutableList<TaggedItem>,
         enabled: Boolean,
         tagCharInput: Char = '@',
@@ -97,7 +97,7 @@ class TaggingViewModel : ViewModel() {
      *
      * @param newValue The new value of the text field.
      */
-    fun onValueChange(newValue: TextFieldValue) {
+    fun onInputValueChanged(newValue: TextFieldValue) {
         val newText = newValue.text
         val previousValue = commentUiState.value.textField.text
         when (val textState = checkStringStatus(newText, previousValue)) {
@@ -214,6 +214,49 @@ class TaggingViewModel : ViewModel() {
     private fun showTagForName(name: String) {
         tagPopUpUiState.update { it.copy(show = true) }
         currentSearch.update { name }
+    }
+
+    /**
+     * Applies styles to an AnnotatedString based on the tagging state.
+     *
+     * @param it The input AnnotatedString.
+     * @param taggingState The list of tagged items indicating the ranges to style.
+     * @return The resultant AnnotatedString with styles applied.
+     */
+    fun getResultantString(
+        it: AnnotatedString,
+        taggingState: MutableList<TaggedItem>
+    ): AnnotatedString {
+        val sortedTaggedItems = taggingState.sortedBy { item -> item.indexStart }
+        val builder = AnnotatedString.Builder(it)
+        for (taggedItem in sortedTaggedItems) {
+            builder.addStyle(
+                SpanStyle(color = defaultTaggedTextColor),
+                taggedItem.indexStart,
+                taggedItem.indexEnd
+            )
+        }
+        return builder.toAnnotatedString()
+    }
+
+
+    /**
+     * Handles the event when a item is tapped. It checks if the updated message would be within
+     * limit and if not, update the comment String with The newestTag and update the commentUiState
+     * with the newTag and its starting and ending indices
+     *
+     * @param item The tapped TaggedItem.
+     */
+    fun onItemTagged(item: TaggedItem) {
+        if (tempTagStartIndex.value == -1)
+            return
+
+        val (start, updatedMessage) = updateCommentString(item)
+        if (checkOutOfLimit(updatedMessage)) return
+
+        val (taggingItemsList, newestTag) = updatedTagListWithLatestItem(item, start)
+        updateCommentUiState(updatedMessage, start, newestTag, taggingItemsList)
+        hideTagPopUp()
     }
 
 
@@ -348,45 +391,6 @@ class TaggingViewModel : ViewModel() {
         }?.indexEnd
     }
 
-    /**
-     * Applies styles to an AnnotatedString based on the tagging state.
-     *
-     * @param it The input AnnotatedString.
-     * @param taggingState The list of tagged items indicating the ranges to style.
-     * @return The resultant AnnotatedString with styles applied.
-     */
-    fun getResultantString(
-        it: AnnotatedString,
-        taggingState: MutableList<TaggedItem>
-    ): AnnotatedString {
-        val sortedTaggedItems = taggingState.sortedBy { item -> item.indexStart }
-        val builder = AnnotatedString.Builder(it)
-        for (taggedItem in sortedTaggedItems) {
-            builder.addStyle(
-                SpanStyle(color = defaultTaggedTextColor),
-                taggedItem.indexStart,
-                taggedItem.indexEnd
-            )
-        }
-        return builder.toAnnotatedString()
-    }
-
-
-    /**
-     * Handles the event when a item is tapped. It checks if the updated message would be within
-     * limit and if not, update the comment String with The newestTag and update the commentUiState
-     * with the newTag and its starting and ending indices
-     *
-     * @param item The tapped TaggedItem.
-     */
-    fun onItemTagged(item: TaggedItem) {
-        val (start, updatedMessage) = updateCommentString(item)
-        if (checkOutOfLimit(updatedMessage)) return
-
-        val (taggingItemsList, newestTag) = updatedTagListWithLatestItem(item, start)
-        updateCommentUiState(updatedMessage, start, newestTag, taggingItemsList)
-        hideTagPopUp()
-    }
 
     /**
      * Updates the comment string by replacing the specified range with a tag for the given item.

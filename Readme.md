@@ -143,13 +143,15 @@ fun TaggingTextField(viewModel: TaggingViewModel = viewModel())
         onValueChange = { viewModel.onValueChange(it) },
         modifier = Modifier.fillMaxWidth()   
       ) 
-    if (popupState.show) { DropdownMenu( 
-      expanded = popupState.show, onDismissRequest = { viewModel.hideTagPopUp() } 
-    ) { popupState.taggingList.forEach { item ->
-        DropdownMenuItem(onClick = { viewModel.onItemTagged(item) }) { Text(text = item.name ?: "")
-        }
-    }
-    }
+    if (popupState.show) { 
+        DropdownMenu( 
+        expanded = popupState.show, onDismissRequest = { viewModel.hideTagPopUp() } 
+        ) { 
+            popupState.taggingList.forEach { item ->
+                DropdownMenuItem(onClick = { viewModel.onItemTagged(item) }) { Text(text = item.name ?: "")
+                }
+          }
+      }
     }
   }
 }   

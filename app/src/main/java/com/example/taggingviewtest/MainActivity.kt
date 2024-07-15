@@ -38,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.taggingviewtest.Tagging.TaggingViewModel
 import com.example.taggingviewtest.Tagging.UI.TaggingPopUp
 import com.example.taggingviewtest.Tagging.data.TagPopUpUiState
 import com.example.taggingviewtest.Tagging.data.TaggedItem
@@ -63,7 +62,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CustomViewForPopIpView(
     modifier: Modifier = Modifier,
-    viewModel: TaggingViewModel = viewModel()
+    viewModel: MyViewModel = viewModel()
 ) {
 //    LaunchedEffect(key1 = Unit) {
     val tagList = listOf(
@@ -72,7 +71,7 @@ fun CustomViewForPopIpView(
         TaggedItem(3, "Third Name", null, data = null),
         TaggedItem(4, "Fourth Name", null, data = null),
     ).toMutableList()
-    viewModel.initViewModel(taggingList = tagList, true)
+    viewModel.initTaggingViews(taggingList = tagList, true)
 //}
     val tagCommentState by viewModel.commentUiState.collectAsState()
     val tagPopUpState by viewModel.filteredTagsUiState.collectAsState(
@@ -98,7 +97,7 @@ fun CustomViewForPopIpView(
         }
         BasicTextField(
             value = tagCommentState.textField,
-            onValueChange = { viewModel.onValueChange(it) },
+            onValueChange = { viewModel.onInputValueChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .border(width = 1.dp, shape = RoundedCornerShape(10.dp), color = Color.Blue)
@@ -132,7 +131,7 @@ fun CustomViewForPopIpView(
 @Composable
 fun DefaultViewForPopIpView(
     modifier: Modifier = Modifier,
-    viewModel: TaggingViewModel = viewModel()
+    viewModel: MyViewModel = viewModel()
 ) {
     val tagList = listOf(
         TaggedItem(1, "First Name", null, data = null),
@@ -140,7 +139,7 @@ fun DefaultViewForPopIpView(
         TaggedItem(3, "Third Name", null, data = null),
         TaggedItem(4, "Fourth Name", null, data = null),
     ).toMutableList()
-    viewModel.initViewModel(taggingList = tagList, true)
+    viewModel.initTaggingViews(taggingList = tagList, true)
     val tagCommentState by viewModel.commentUiState.collectAsState()
     val tagPopUpState by viewModel.filteredTagsUiState.collectAsState(
         initial = TagPopUpUiState(
@@ -157,7 +156,6 @@ fun DefaultViewForPopIpView(
             tagPopUpState = tagPopUpState,
             modifier = Modifier,
         ) { modifier, taggedItem ->
-
             Column(modifier = modifier.clickable {
                 viewModel.onItemTagged(item = taggedItem)
             }) {
@@ -204,7 +202,7 @@ fun DefaultViewForPopIpView(
         }
         BasicTextField(
             value = tagCommentState.textField,
-            onValueChange = { viewModel.onValueChange(it) },
+            onValueChange = { viewModel.onInputValueChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .border(width = 1.dp, shape = RoundedCornerShape(10.dp), color = Color.Blue)

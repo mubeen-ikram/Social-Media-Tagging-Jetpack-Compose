@@ -43,7 +43,15 @@ optional tag character and filter function.
 Plain
 
 ```kotlin
-viewModel.initViewModel(      taggingList = mutableListOf(),  // List of TaggedItem      enabled = true,                 // Boolean to enable or disable tagging      tagCharInput = '@',             // Character used for tagging      onFilter = { search, item ->    // Filter function for suggestions          item.name?.contains(search, ignoreCase = true) ?: true      }  )   `
+viewModel.initViewModel(
+  taggingList = mutableListOf(),
+  // List of TaggedItem    
+  // enabled = true,                 
+  // Boolean to enable or disable tagging   
+  // tagCharInput = '@',             
+  // Character used for tagging    
+  // onFilter = { search, item ->    // Filter function for suggestions          item.name?.contains(search, ignoreCase = true) ?: true      }  
+   )
 ``` 
 
 State Variables
@@ -123,7 +131,28 @@ Usage Example
 
 Below is an example of how to use TaggingViewModel within a Composable function.
 
-```kotlin   kotlinCopy code@Composable  fun TaggingTextField(viewModel: TaggingViewModel = viewModel()) { val uiState by viewModel.commentUiState.collectAsState()      val popupState by viewModel.filteredTagsUiState.collectAsState()      Column { TextField(              value = uiState.textField, onValueChange = { viewModel.onValueChange(it) }, modifier = Modifier.fillMaxWidth()          )          if (popupState.show) { DropdownMenu(                  expanded = popupState.show, onDismissRequest = { viewModel.hideTagPopUp() }              ) { popupState.taggingList.forEach { item ->                      DropdownMenuItem(onClick = { viewModel.onItemTagged(item) }) { Text(text = item.name ?: "")                      } } } } } }   
+```kotlin   
+@Composable
+fun TaggingTextField(viewModel: TaggingViewModel = viewModel()) 
+{ 
+    val uiState by viewModel.commentUiState.collectAsState()
+  val popupState by viewModel.filteredTagsUiState.collectAsState()
+  Column { 
+      TextField(       
+        value = uiState.textField,
+        onValueChange = { viewModel.onValueChange(it) },
+        modifier = Modifier.fillMaxWidth()   
+      ) 
+    if (popupState.show) { DropdownMenu( 
+      expanded = popupState.show, onDismissRequest = { viewModel.hideTagPopUp() } 
+    ) { popupState.taggingList.forEach { item ->
+        DropdownMenuItem(onClick = { viewModel.onItemTagged(item) }) { Text(text = item.name ?: "")
+        }
+    }
+    }
+    }
+  }
+}   
 ```
 
 This example demonstrates a simple text field with tagging functionality. The TaggingViewModel

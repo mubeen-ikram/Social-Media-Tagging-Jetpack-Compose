@@ -65,10 +65,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("id.zelory:compressor:3.0.1")
 
 //    extra dependency// ViewModel
-        implementation(libs.androidx.lifecycle.viewmodel)
-        implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
 
 }
